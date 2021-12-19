@@ -3,6 +3,7 @@ package br.com.home.finansys.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,21 @@ public class CategoryService {
             // se presente e os id's forem diferentes, não inserir
         if (opt.isPresent()   && ( category.getId() != null &&  !category.getId().equals(opt.get().getId())) )
             throw new RuntimeException("O identificador já existe para outra categoria");
+    }
+
+    public void update(Category category, Long id) {
+            validateCategoryUpdate(category, id);
+            repository.save(category);
+    }
+
+    private void validateCategoryUpdate(Category category, Long id) {
+        if (category.getId() == null || id == null)
+            throw new RuntimeException("Categoria não pode ser nula");
+ 
+        Category categoryFind = findById(id);
+        //copiar tudo exceto name e description
+        BeanUtils.copyProperties(category, categoryFind, "id");
+
     }
 
 }
